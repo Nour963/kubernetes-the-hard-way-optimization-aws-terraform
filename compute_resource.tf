@@ -190,7 +190,7 @@ resource "aws_instance" "k8s-MSTR" {
   associate_public_ip_address = true
   source_dest_check           = false
   user_data                   = "name=master-${count.index + 1}"
-  #iam_instance_profile        = "${aws_iam_instance_profile.mstr-profile.name}"
+  iam_instance_profile        = "${aws_iam_instance_profile.mstr-profile.name}"
   
 
   tags = {
@@ -218,7 +218,7 @@ resource "aws_instance" "k8s-WRKR" {
   associate_public_ip_address = true
   source_dest_check           = false
   user_data                   = "name=worker-${count.index + 1}|pod-cidr=10.200.${count.index+1}.0/24"
- # iam_instance_profile        = "${aws_iam_instance_profile.wrkr-profile.name}"
+  iam_instance_profile        = "${aws_iam_instance_profile.wrkr-profile.name}"
 
 
   tags = {
