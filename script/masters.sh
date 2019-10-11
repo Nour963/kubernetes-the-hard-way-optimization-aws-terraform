@@ -113,12 +113,13 @@ Documentation=https://github.com/kubernetes/kubernetes
 
 [Service]
 ExecStart=/usr/local/bin/aws-cloud-controller-manager \\
-  --cloud-provider=aws
   --kubeconfig=/var/lib/kubernetes/cloud-controller-manager.kubeconfig \\  
   --cluster-cidr=10.200.0.0/16 \\
   --cluster-name=kubernetes \\
   --authentication-kubeconfig=/var/lib/kubernetes/cloud-controller-manager.kubeconfig 
   --authorization-kubeconfig=/var/lib/kubernetes/cloud-controller-manager.kubeconfig
+  --requestheader-client-ca-file=/var/lib/kubernetes/ca.pem
+  --requestheader-allowed-names=aggregator
   --leader-elect=true \\
   --use-service-account-credentials=true \\
   --v=2
