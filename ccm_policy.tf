@@ -47,10 +47,22 @@ EOF
   }
 }
 
+resource "aws_iam_instance_profile" "mstr-profile" {
+  name = "mstr-profile"
+  role = "${aws_iam_role.mstr-role.name}"
+}
+
+
+resource "aws_iam_instance_profile" "wrkr-profile" {
+  name = "wrkr-profile"
+  role = "${aws_iam_role.wrkr-role.name}"
+}
+
 #MASTER POLICY FOR CLOUD-CONTROLLER-MANAGER
-resource "aws_iam_policy" "mstr-policy" {
+resource "aws_iam_role_policy" "mstr-policy" {
   name        = "master-policy"
-  description = "for cloud contreolelr manager"
+  role = "${aws_iam_role.mstr-role.id}"
+  
   
 
   policy = <<EOF
@@ -125,9 +137,9 @@ EOF
 }
 
 #WORKER POLICY FOR CLOUD-CONTROLLER-MANAGER
-resource "aws_iam_policy" "wrkr-policy" {
+resource "aws_iam_role_policy" "wrkr-policy" {
   name        = "worker-policy"
-  description = "for cloud contreolelr manager"
+  role = "${aws_iam_role.wrkr-role.id}"
 
   
 
@@ -155,7 +167,7 @@ resource "aws_iam_policy" "wrkr-policy" {
 EOF
 }
 
-resource "aws_iam_policy_attachment" "master" {
+/*resource "aws_iam_policy_attachment" "master" {
   name       = "mstr-attachment"
   roles      = ["${aws_iam_role.mstr-role.name}"]
   policy_arn = "${aws_iam_policy.mstr-policy.arn}"
@@ -165,16 +177,6 @@ resource "aws_iam_policy_attachment" "worker" {
   name       = "wrkr-attachment"
   roles      = ["${aws_iam_role.wrkr-role.name}"]
   policy_arn = "${aws_iam_policy.wrkr-policy.arn}"
-}
+}*/
 
 #Create EC2 Instance Profile
-resource "aws_iam_instance_profile" "mstr-profile" {
-  name = "mstr-profile"
-  role = "${aws_iam_role.mstr-role.name}"
-}
-
-
-resource "aws_iam_instance_profile" "wrkr-profile" {
-  name = "wrkr-profile"
-  role = "${aws_iam_role.wrkr-role.name}"
-}
