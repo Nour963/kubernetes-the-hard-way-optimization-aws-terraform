@@ -16,7 +16,9 @@ cd bin/
 sudo chmod +x aws-cloud-controller-manager
 sudo mv aws-cloud-controller-manager /usr/local/bin/
 cd /home/ubuntu/
+
 #_______________________INSTALL_KUBE-*_____________________________________________________
+
 sudo mkdir -p /etc/kubernetes/config
 wget -q --show-progress --https-only --timestamping \
   "https://storage.googleapis.com/kubernetes-release/release/v1.15.3/bin/linux/amd64/kube-apiserver" \
@@ -112,16 +114,16 @@ Documentation=https://github.com/kubernetes/kubernetes
 
 [Service]
 ExecStart=/usr/local/bin/aws-cloud-controller-manager \\
-  --kubeconfig=/var/lib/kubernetes/cloud-controller-manager.kubeconfig \\  
-  --cluster-cidr=10.200.0.0/16 \\
-  --cluster-name=kubernetes \\
-  --authentication-kubeconfig=/var/lib/kubernetes/cloud-controller-manager.kubeconfig \\
-  --authorization-kubeconfig=/var/lib/kubernetes/cloud-controller-manager.kubeconfig \\
-  --requestheader-client-ca-file=/var/lib/kubernetes/ca.pem \\
-  --requestheader-allowed-names=aggregator \\
-  --leader-elect=true \\
-  --use-service-account-credentials=true \\
-  --v=2
+   --kubeconfig=/var/lib/kubernetes/kube-controller-manager.kubeconfig \\
+   --authentication-kubeconfig=/var/lib/kubernetes/cloud-controller-manager.kubeconfig \\
+   --authorization-kubeconfig=/var/lib/kubernetes/cloud-controller-manager.kubeconfig \\
+   --requestheader-client-ca-file=/var/lib/kubernetes/ca.pem \\
+   --requestheader-allowed-names=aggregator \\
+   --allocate-node-cidrs=false
+   --configure-cloud-routes=false
+   --leader-elect=true \\
+   --use-service-account-credentials=true \\
+   --v=2
 Restart=on-failure
 RestartSec=5
 
@@ -158,6 +160,8 @@ sudo mv kube-scheduler.service /etc/systemd/system/kube-scheduler.service
 sudo systemctl daemon-reload
 sudo systemctl enable kube-apiserver kube-controller-manager cloud-controller-manager kube-scheduler 
 sudo systemctl start kube-apiserver kube-controller-manager cloud-controller-manager kube-scheduler
+
+
 
 
 
