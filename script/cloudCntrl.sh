@@ -1,5 +1,13 @@
 #!/bin/bash -v
 
+#PREVIOUS RULES
+#- apiGroups:
+#  - ""
+#  resources:
+#  - "*"
+#  verbs:
+#  - "*"
+
 cat <<EOF | kubectl apply --kubeconfig admin.kubeconfig -f -
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
@@ -81,4 +89,5 @@ subjects:
     kind: User
     name: system:cloud-controller-manager
 EOF
+
 
