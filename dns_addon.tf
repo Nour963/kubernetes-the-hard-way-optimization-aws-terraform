@@ -8,8 +8,8 @@ depends_on =[
 
   connection {
     type         = "ssh"
-    user         = "ubuntu"
-    password     = ""
+    user          = var.user
+    password      = var.password 
     host         = "${aws_instance.k8s-MSTR[0].public_ip}"
     private_key  = "${file("./key/k8shardkey.pem")}"
    

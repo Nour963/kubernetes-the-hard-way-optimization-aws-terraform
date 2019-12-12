@@ -10,7 +10,7 @@ resource "aws_vpc" "k8s_VPC" {
   enable_dns_hostnames = "true"
 
   tags = {
-    Name = "kubernetes"
+    Name = var.name
   }
 }
 
@@ -20,7 +20,7 @@ resource "aws_subnet" "k8s-SUB" {
   cidr_block = "10.240.0.0/24"
 
   tags = {
-    Name = "kubernetes"
+    Name = var.name
   }
 }
 
@@ -29,7 +29,7 @@ resource "aws_internet_gateway" "k8s-GW" {
   vpc_id = "${aws_vpc.k8s_VPC.id}"
 
   tags = {
-    Name = "kubernetes"
+    Name = var.name
   }
 }
 
@@ -44,7 +44,7 @@ resource "aws_route_table" "k8s-RT" {
 
   
   tags = {
-    Name = "kubernetes"
+    Name = var.name
   }
 }
 
@@ -56,7 +56,7 @@ depends_on                = [
       aws_instance.k8s-MSTR,
       ]
 
-  count = 2
+  count = var.Wcount
   route_table_id            = "${aws_route_table.k8s-RT.id}"
   destination_cidr_block    = "10.200.${count.index+1}.0/24"
   instance_id               = "${aws_instance.k8s-WRKR[count.index].id}"
@@ -74,7 +74,7 @@ resource "aws_route_table_association" "a" {
 #SECURITY GROUP
 resource "aws_security_group" "k8s-SG" {
   vpc_id      = "${aws_vpc.k8s_VPC.id}"
-  name        = "kubernetes"
+  name        = var.name
   description = "Kubernetes security group"
 
   ingress {
@@ -123,13 +123,13 @@ resource "aws_security_group" "k8s-SG" {
   }
 
   tags = {
-    Name = "kubernetes"
+    Name = var.name
   }
 }
 
 #LOAD BALANCER
 resource "aws_lb" "k8s-LB" {
-  name               = "kubernetes"
+  name               = var.name
   internal           = false
   load_balancer_type = "network"
   
@@ -139,13 +139,13 @@ resource "aws_lb" "k8s-LB" {
       } 
   
   tags = {
-    Name = "kubernetes"
+    Name = var.name
   }
 }
 
 #TARGET GROUP
 resource "aws_lb_target_group" "k8s-TG" {
-  name        = "kubernetes"
+  name        = var.name
   port        = 6443
   protocol    = "TCP"
   target_type = "ip"
@@ -154,7 +154,7 @@ resource "aws_lb_target_group" "k8s-TG" {
 
 #TARGET GROUP ATTACHEMENT
 resource "aws_lb_target_group_attachment" "k8s-TGA" {
-  count            = 2
+  count            = var.Wcount
   target_group_arn = "${aws_lb_target_group.k8s-TG.arn}"
   target_id        = "10.240.0.1${count.index+1}"      #10.240.0.1{1,2}
   
@@ -180,9 +180,9 @@ resource "aws_key_pair" "k8s-KEY" {
 
 #MASTER NODES
 resource "aws_instance" "k8s-MSTR" {
-  count                       = 2
-  ami                         = "ami-03ef731cc103c9f09"
-  instance_type               = "t3.micro"
+  count                       = var.Mcount
+  ami                         = var.ami
+  instance_type               = var.instancetype
   key_name                    = "${aws_key_pair.k8s-KEY.key_name}"
   subnet_id                   = "${aws_subnet.k8s-SUB.id}"
   private_ip                  = "10.240.0.1${count.index + 1}"
@@ -208,9 +208,9 @@ resource "aws_instance" "k8s-MSTR" {
  
 #WORKER NODES
 resource "aws_instance" "k8s-WRKR" {
-  count                       = 2
-  ami                         = "ami-03ef731cc103c9f09"
-  instance_type               = "t3.micro"
+  count                       = var.Wcount
+  ami                         = var.ami
+  instance_type               = var.instancetype
   key_name                    = "${aws_key_pair.k8s-KEY.key_name}"
   subnet_id                   = "${aws_subnet.k8s-SUB.id}"
   private_ip                  = "10.240.0.2${count.index + 1}"

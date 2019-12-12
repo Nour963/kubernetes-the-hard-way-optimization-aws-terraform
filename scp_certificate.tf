@@ -2,7 +2,7 @@
 
 resource "null_resource" "ca-workers" {
 
-  count = 2
+  count = var.Wcount
 
   depends_on = [
     local_file.kubelet_crt,
@@ -12,7 +12,8 @@ resource "null_resource" "ca-workers" {
 
   connection {
     type          = "ssh"
-    user          = "ubuntu"
+    user          = var.user
+    password      = var.password  
     host          = "${aws_instance.k8s-WRKR[count.index].public_ip}"
     private_key   = "${file("./key/k8shardkey.pem")}"
    
@@ -40,7 +41,7 @@ resource "null_resource" "ca-workers" {
 
 resource "null_resource" "ca-masters" {
 
-  count = 2
+  count = var.Mcount
 
   depends_on = [
     local_file.service-account_key,
@@ -53,7 +54,8 @@ resource "null_resource" "ca-masters" {
 
   connection {
     type         = "ssh"
-    user         = "ubuntu"
+    user          = var.user
+    password      = var.password 
     host         = "${aws_instance.k8s-MSTR[count.index].public_ip}"
     private_key  = "${file("./key/k8shardkey.pem")}"
    

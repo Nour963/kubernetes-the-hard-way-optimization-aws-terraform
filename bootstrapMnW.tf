@@ -5,13 +5,13 @@ depends_on =[
   null_resource.kubcnf-masters,
   aws_lb.k8s-LB,
 ]
-  count = 2
+  count = var.Mcount
 
 
   connection {
     type         = "ssh"
-    user         = "ubuntu"
-    password     = ""
+    user          = var.user
+    password      = var.password 
     host         = "${aws_instance.k8s-MSTR[count.index].public_ip}"
     private_key  = "${file("./key/k8shardkey.pem")}"
    
@@ -39,8 +39,8 @@ depends_on =[
 
   connection {
     type         = "ssh"
-    user         = "ubuntu"
-    password     = ""
+    user          = var.user
+    password      = var.password 
     host         = "${aws_instance.k8s-MSTR[0].public_ip}"
     private_key  = "${file("./key/k8shardkey.pem")}"
    
@@ -65,13 +65,13 @@ resource "null_resource" "bash-workers" {
 depends_on =[
   null_resource.Only-master1,
 ]
-  count = 2
+  count = var.Wcount
 
 
   connection {
     type         = "ssh"
-    user         = "ubuntu"
-    password     = ""
+    user          = var.user
+    password      = var.password 
     host         = "${aws_instance.k8s-WRKR[count.index].public_ip}"
     private_key  = "${file("./key/k8shardkey.pem")}"
    

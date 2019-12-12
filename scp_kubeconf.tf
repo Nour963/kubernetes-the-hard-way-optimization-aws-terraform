@@ -2,7 +2,7 @@
 
 resource "null_resource" "kubcnf-workers" {
 
-  count = 2
+  count = var.Wcount
 
   depends_on = [
     local_file.kube_proxy,
@@ -13,7 +13,8 @@ resource "null_resource" "kubcnf-workers" {
 
   connection {
     type          = "ssh"
-    user          = "ubuntu"
+    user          = var.user
+    password      = var.password 
     host          = "${aws_instance.k8s-WRKR[count.index].public_ip}"
     private_key   = "${file("./key/k8shardkey.pem")}"
    
@@ -33,7 +34,7 @@ resource "null_resource" "kubcnf-workers" {
 #___________________MASTERS______________________________
 
 resource "null_resource" "kubcnf-masters" {
-  count = 2
+  count = var.Mcount
 
   depends_on = [
     local_file.kube_ctrl,
@@ -44,7 +45,8 @@ resource "null_resource" "kubcnf-masters" {
 
   connection {
     type          = "ssh"
-    user          = "ubuntu"
+    user          = var.user
+    password      = var.password 
     host          = "${aws_instance.k8s-MSTR[count.index].public_ip}"
     private_key   = "${file("./key/k8shardkey.pem")}"
    

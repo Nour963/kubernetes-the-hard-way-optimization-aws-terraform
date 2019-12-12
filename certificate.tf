@@ -1,8 +1,8 @@
 #____________________________CA______________________________________
 
 resource "tls_private_key" "kube_ca" {
-  algorithm              = "RSA"
-  rsa_bits               = "2048"
+  algorithm              = var.tlsalgo
+  rsa_bits               = var.bitsalgo
 }
 
 resource "tls_self_signed_cert" "kube_ca" {
@@ -43,8 +43,8 @@ resource "local_file" "kube_ca_crt" {
 #__ADMIN___________________________________________________________________
 
 resource "tls_private_key" "kube_admin" {
-  algorithm               = "RSA"
-  rsa_bits                = "2048"
+  algorithm              = var.tlsalgo
+  rsa_bits               = var.bitsalgo
 }
 
 resource "tls_cert_request" "kube_admin" {
@@ -91,8 +91,8 @@ resource "local_file" "kube_admin_crt" {
 #________________CONTROLLER-MANAGER_________________________________________
 
 resource "tls_private_key" "kube_controller_manager" {
-  algorithm              = "RSA"
-  rsa_bits               = "2048"
+  algorithm              = var.tlsalgo
+  rsa_bits               = var.bitsalgo
 }
 
 resource "tls_cert_request" "kube_controller_manager" {
@@ -139,8 +139,8 @@ resource "local_file" "kube_controller_manager_crt" {
 #________________CLOUD-CONTROLLER-MANAGER_________________________________________
 
 resource "tls_private_key" "cloud_controller_manager" {
-  algorithm              = "RSA"
-  rsa_bits               = "2048"
+  algorithm              = var.tlsalgo
+  rsa_bits               = var.bitsalgo
 }
 
 resource "tls_cert_request" "cloud_controller_manager" {
@@ -187,8 +187,8 @@ resource "local_file" "cloud_controller_manager_crt" {
 #______________KUBE PROXY_________________________
 
 resource "tls_private_key" "kube_proxy" {
-  algorithm              = "RSA"
-  rsa_bits               = "2048"
+  algorithm              = var.tlsalgo
+  rsa_bits               = var.bitsalgo
 }
 
 resource "tls_cert_request" "kube_proxy" {
@@ -234,8 +234,8 @@ resource "local_file" "kube_proxy_crt" {
 
 #_______________SCHEDULER__________________________
 resource "tls_private_key" "kube_scheduler" {
-  algorithm              = "RSA"
-  rsa_bits               = "2048"
+  algorithm              = var.tlsalgo
+  rsa_bits               = var.bitsalgo
 }
 
 resource "tls_cert_request" "kube_scheduler" {
@@ -281,8 +281,8 @@ resource "local_file" "kube_scheduler_crt" {
 
 #__________________SERVICE ACCOUNT___________________
 resource "tls_private_key" "service-account" {
-  algorithm              = "RSA"
-  rsa_bits               = "2048"
+  algorithm              = var.tlsalgo
+  rsa_bits               = var.bitsalgo
 }
 
 resource "tls_cert_request" "service-account" {
@@ -328,8 +328,8 @@ resource "local_file" "service-account_crt" {
 
 #___________________________API SERVER_________________________
 resource "tls_private_key" "kubernetes" {
-  algorithm              = "RSA"
-  rsa_bits               = "2048"
+  algorithm              = var.tlsalgo
+  rsa_bits               = var.bitsalgo
 }
 
 resource "tls_cert_request" "kubernetes" {
@@ -393,15 +393,15 @@ resource "local_file" "kubernetes_crt" {
 
 #_______________KUBELET_________________________
 resource "tls_private_key" "kubelet" {
-  count                  = 2
-  algorithm              = "RSA"
-  rsa_bits               = "2048"
+  count                  = var.Wcount
+  algorithm              = var.tlsalgo
+  rsa_bits               = var.bitsalgo
 }
 
 resource "tls_cert_request" "kubelet" {
   key_algorithm          = tls_private_key.kubelet[count.index].algorithm
   private_key_pem        = tls_private_key.kubelet[count.index].private_key_pem
-  count                  = 2
+  count                  = var.Wcount
 
   lifecycle {
     ignore_changes       = [id]
@@ -427,7 +427,7 @@ resource "tls_cert_request" "kubelet" {
 }
 
 resource "tls_locally_signed_cert" "kubelet" {
-  count                  = 2
+  count                  = var.Wcount
   cert_request_pem       = tls_cert_request.kubelet[count.index].cert_request_pem
   ca_key_algorithm       = tls_private_key.kube_ca.algorithm
   ca_private_key_pem     = tls_private_key.kube_ca.private_key_pem
@@ -445,14 +445,14 @@ resource "tls_locally_signed_cert" "kubelet" {
 }
 
 resource "local_file" "kubelet_key" {
-  count                  = 2
+  count                  = var.Wcount
 
   content                = tls_private_key.kubelet[count.index].private_key_pem
   filename               = "./certificate/kubelet/worker-${count.index+1}-key.pem"
 }
 
 resource "local_file" "kubelet_crt" {
-  count                  = 2
+  count                  = var.Wcount
 
   content                = tls_locally_signed_cert.kubelet[count.index].cert_pem
   filename               = "./certificate/kubelet/worker-${count.index+1}.pem"
